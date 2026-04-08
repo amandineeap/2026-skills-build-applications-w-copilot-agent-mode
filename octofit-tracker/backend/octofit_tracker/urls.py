@@ -1,0 +1,52 @@
+"""octofit_tracker URL Configuration
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/4.1/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+
+
+import os
+from django.contrib import admin
+from django.urls import path, include
+from django.shortcuts import redirect
+from rest_framework.routers import DefaultRouter
+from django.http import JsonResponse
+from . import views
+
+# Codespace URL logic (like settings.py)
+CODESPACE_NAME = os.environ.get('CODESPACE_NAME')
+if CODESPACE_NAME:
+    CODESPACE_URL = f"https://{CODESPACE_NAME}-8000.app.github.dev"
+else:
+    CODESPACE_URL = "http://localhost:8000"
+
+
+router = DefaultRouter()
+router.register(r'users', views.UserViewSet, basename='user')
+router.register(r'teams', views.TeamViewSet, basename='team')
+router.register(r'activities', views.ActivityViewSet, basename='activity')
+router.register(r'leaderboard', views.LeaderboardViewSet, basename='leaderboard')
+router.register(r'workouts', views.WorkoutViewSet, basename='workout')
+
+
+# Use DRF's api_root from views.py and include router URLs
+def root_redirect(request):
+    # Optionally, pass the codespace URL as a query param or context if needed
+    return redirect('/api/', permanent=False)
+
+urlpatterns = [
+    path('', root_redirect),
+    path('admin/', admin.site.urls),
+    path('api/', views.api_root, name='api-root'),
+    path('api/', include(router.urls)),
+]
