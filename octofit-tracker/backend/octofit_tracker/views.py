@@ -1,3 +1,5 @@
+
+import os
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -27,7 +29,13 @@ class WorkoutViewSet(viewsets.ModelViewSet):
 
 @api_view(['GET'])
 def api_root(request, format=None):
+    codespace_name = os.environ.get('CODESPACE_NAME', '')
+    if codespace_name:
+        codespace_url = f"https://{codespace_name}-8000.app.github.dev"
+    else:
+        codespace_url = "http://localhost:8000"
     return Response({
+        'codespace_url': codespace_url,
         'users': reverse('user-list', request=request, format=format),
         'teams': reverse('team-list', request=request, format=format),
         'activities': reverse('activity-list', request=request, format=format),
