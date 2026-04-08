@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+
 import os
 from django.contrib import admin
 from django.urls import path, include
@@ -21,6 +22,13 @@ from django.shortcuts import redirect
 from rest_framework.routers import DefaultRouter
 from django.http import JsonResponse
 from . import views
+
+# Codespace URL logic (like settings.py)
+CODESPACE_NAME = os.environ.get('CODESPACE_NAME')
+if CODESPACE_NAME:
+    CODESPACE_URL = f"https://{CODESPACE_NAME}-8000.app.github.dev"
+else:
+    CODESPACE_URL = "http://localhost:8000"
 
 
 router = DefaultRouter()
@@ -33,6 +41,7 @@ router.register(r'workouts', views.WorkoutViewSet, basename='workout')
 
 # Use DRF's api_root from views.py and include router URLs
 def root_redirect(request):
+    # Optionally, pass the codespace URL as a query param or context if needed
     return redirect('/api/', permanent=False)
 
 urlpatterns = [
